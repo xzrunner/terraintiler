@@ -1,0 +1,5 @@
+terraintiler/
+projects/*
+
+!projects/terraintiler.vcxproj
+!projects/terraintiler.vcxproj.filters
