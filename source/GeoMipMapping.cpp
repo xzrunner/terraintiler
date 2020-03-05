@@ -1,8 +1,7 @@
 #include "terraintiler/GeoMipMapping.h"
 
 #include <heightfield/HeightField.h>
-//#include <terraingraph/device/CellularNoise.h>
-#include <terraingraph/device/PlasmaFractal.h>
+#include <terraingraph/device/CellularNoise.h>
 
 namespace terraintiler
 {
@@ -23,9 +22,13 @@ ur::TexturePtr GeoMipMapping::QueryHeightmap(size_t x, size_t y) const
     auto& tile = m_tiles[y * m_width + x];
     if (!tile.heightmap)
     {
-        terraingraph::device::PlasmaFractal noise;
+        terraingraph::device::CellularNoise noise;
+        noise.SetResolution(sm::vec2(1, 1));
+        noise.SetOffset(sm::vec2(x, y));
+
         noise.SetWidth(64);
         noise.SetHeight(64);
+
         noise.Execute();
 
         tile.heightmap = noise.GetHeightField()->GetHeightmap();
