@@ -11,12 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\terraintiler\Clipmap.h" />
     <ClInclude Include="..\..\..\include\terraintiler\GeoMipMapping.h" />
     <ClInclude Include="..\..\..\include\terraintiler\GeomTile.h" />
     <ClInclude Include="..\..\..\include\terraintiler\Renderable.h" />
     <ClInclude Include="..\..\..\include\terraintiler\TileLoader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\source\Clipmap.cpp" />
     <ClCompile Include="..\..\..\source\GeoMipMapping.cpp" />
     <ClCompile Include="..\..\..\source\GeomTile.cpp" />
     <ClCompile Include="..\..\..\source\TileLoader.cpp" />
