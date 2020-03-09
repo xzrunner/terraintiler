@@ -2,6 +2,7 @@
 
 #include <unirender/Blackboard.h>
 #include <unirender/RenderContext.h>
+#include <heightfield/Utility.h>
 
 #include <vector>
 
@@ -17,8 +18,8 @@ Renderable GeomTile::GetRenderable(size_t lod) const
     return lod >= MAX_LOD_LEVEL ? m_rd[MAX_LOD_LEVEL - 1] : m_rd[lod];
 }
 
-void GeomTile::Build(const sm::rect& region, size_t width, size_t height, 
-                     const std::vector<float>& heights)
+void GeomTile::Build(const sm::rect& region, size_t width, size_t height,
+                     const std::vector<int32_t>& heights)
 {
     m_built = true;
 
@@ -28,14 +29,14 @@ void GeomTile::Build(const sm::rect& region, size_t width, size_t height,
 
     std::vector<sm::vec3> verts;
     verts.resize(heights.size());
-    for (size_t y = 0; y < height; ++y) 
+    for (size_t y = 0; y < height; ++y)
     {
-        for (size_t x = 0; x < width; ++x) 
+        for (size_t x = 0; x < width; ++x)
         {
             const auto idx = y * width + x;
             auto& v = verts[idx];
             v.x = region.xmin + (region.xmax - region.xmin) / (width - 1) * x;
-            v.y = heights[idx];
+            v.y = hf::Utility::HeightShortToFloat(heights[idx]);
             v.z = region.ymin + (region.ymax - region.ymin) / (height - 1) * y;
         }
     }
@@ -85,7 +86,7 @@ void GeomTile::Build(const sm::rect& region, size_t width, size_t height,
 
         w = new_w;
         h = new_h;
-        verts = new_verts;        
+        verts = new_verts;
     }
 }
 

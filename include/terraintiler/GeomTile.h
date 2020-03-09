@@ -20,7 +20,7 @@ public:
     Renderable GetRenderable(size_t lod) const;
 
     void Build(const sm::rect& region, size_t width, size_t height,
-        const std::vector<float>& heights);
+        const std::vector<int32_t>& heights);
 
     bool IsBuilt() const { return m_built; }
 

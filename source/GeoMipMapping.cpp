@@ -68,16 +68,23 @@ void GeoMipMapping::UpdateTile(size_t x, size_t y)
 
         noise->SetResolution(sm::vec2(1, 1));
         noise->SetOffset(sm::vec2(static_cast<float>(x), static_cast<float>(y)));
-        
+
         noise->SetWidth(65);
         noise->SetHeight(65);
         //noise->SetWidth(1025);
         //noise->SetHeight(1025);
 
         noise->Execute();
-        
+
         auto hf = noise->GetHeightField();
-        tile.Build(sm::rect(x, y, x + 1, y + 1), hf->Width(), hf->Height(), hf->GetValues());
+
+        sm::rect r;
+        r.xmin = static_cast<float>(x);
+        r.xmax = r.xmin + 1;
+        r.ymin = static_cast<float>(y);
+        r.ymax = r.ymin + 1;
+
+        tile.Build(r, hf->Width(), hf->Height(), hf->GetValues());
     }
 }
 
