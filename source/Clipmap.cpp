@@ -4,7 +4,13 @@
 #include <unirender/Blackboard.h>
 #include <unirender/RenderContext.h>
 #include <heightfield/HeightField.h>
+#ifdef HEIGHT_MAP_PCG
 #include <terraingraph/device/CellularNoise.h>
+#else
+#include <clipmap/TextureStack.h>
+#include <clipmap/Clipmap.h>
+#include <terraintiler/VirtualTexture.h>
+#endif // HEIGHT_MAP_PCG
 
 #include <vector>
 
@@ -21,12 +27,14 @@ const float START_SZ = 1.0f;
 namespace terraintiler
 {
 
-Clipmap::Clipmap()
+Clipmap::Clipmap(const std::string& vtex_path)
 {
+#ifndef HEIGHT_MAP_PCG
+    InitVTex(vtex_path);
+#endif // HEIGHT_MAP_PCG
     Build();
 
-    // todo
-
+#ifdef HEIGHT_MAP_PCG
     terraingraph::device::CellularNoise noise;
     noise.SetWidth(RESOLUTION);
     noise.SetHeight(RESOLUTION);
@@ -41,8 +49,51 @@ Clipmap::Clipmap()
         noise.Execute();
 
         m_layers[i].heightmap = noise.GetHeightField()->GetHeightmap();
+        m_layers[i].uv_region.Assign(0, 0, 1, 1);
     }
+#endif // HEIGHT_MAP_PCG
 }
+
+void Clipmap::Update(float scale)
+{
+#ifndef HEIGHT_MAP_PCG
+    m_vtex->Update(scale, sm::vec2(0, 0));
+
+    auto& layers = m_vtex->GetAllLayers();
+    const auto tex_sz = m_vtex->GetStackTexSize();
+
+    //double uv_scale = 1.0 / std::pow(2, layers.size() - 1);
+    double uv_scale = 1.0 / std::pow(2, 1);
+    for (size_t i = 0, n = layers.size(); i < n; ++i)
+    {
+        m_layers[i].heightmap = layers[i].tex;
+
+        auto pos = 1.0 / std::pow(2, i) / 2 - uv_scale * 0.5f;
+        m_layers[i].uv_region.x = m_layers[i].uv_region.y = pos;
+        m_layers[i].uv_region.z = m_layers[i].uv_region.w = uv_scale;
+    }
+
+#endif // HEIGHT_MAP_PCG
+}
+
+void Clipmap::DebugDraw() const
+{
+#ifndef HEIGHT_MAP_PCG
+    m_vtex->DebugDraw();
+#endif // HEIGHT_MAP_PCG
+}
+
+#ifndef HEIGHT_MAP_PCG
+void Clipmap::InitVTex(const std::string& vtex_path)
+{
+    textile::VTexInfo info;
+    std::fstream fin(vtex_path, std::ios::in | std::ios::binary);
+    textile::TileDataFile::ReadHeader(info, fin);
+    fin.close();
+
+    m_vtex = std::make_shared<clipmap::Clipmap>(vtex_path, info);
+}
+#endif // HEIGHT_MAP_PCG
 
 void Clipmap::Build()
 {
@@ -143,20 +194,10 @@ Clipmap::Block Clipmap::BuildBlock(const sm::rect& region, size_t res, float sca
     Block b;
     b.rd = rd;
 
-    if (scale == 1)
-    {
-        b.trans.x = 1.0f / scale;
-        b.trans.y = 1.0f / scale;
-        b.trans.z = 0.5f;
-        b.trans.w = 0.5f;
-    }
-    else
-    {
-        b.trans.x = 1.0f / scale;
-        b.trans.y = 1.0f / scale;
-        b.trans.z = 0.5f;
-        b.trans.w = 0.5f;
-    }
+    b.trans.x = 1.0f / scale;
+    b.trans.y = 1.0f / scale;
+    b.trans.z = 0.5f;
+    b.trans.w = 0.5f;
 
     return b;
 }

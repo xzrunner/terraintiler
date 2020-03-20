@@ -16,12 +16,14 @@
     <ClInclude Include="..\..\..\include\terraintiler\GeomTile.h" />
     <ClInclude Include="..\..\..\include\terraintiler\Renderable.h" />
     <ClInclude Include="..\..\..\include\terraintiler\TileLoader.h" />
+    <ClInclude Include="..\..\..\include\terraintiler\VirtualTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\Clipmap.cpp" />
     <ClCompile Include="..\..\..\source\GeoMipMapping.cpp" />
     <ClCompile Include="..\..\..\source\GeomTile.cpp" />
     <ClCompile Include="..\..\..\source\TileLoader.cpp" />
+    <ClCompile Include="..\..\..\source\VirtualTexture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>terraintiler</ProjectName>
@@ -66,7 +68,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\unirender\include;..\..\..\..\dag\include;..\..\..\..\heightfield\include;..\..\..\..\terraingraph\include;..\..\..\..\primitive\include;..\..\..\..\external\boost\include;..\..\..\..\external\rttr\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\unirender\include;..\..\..\..\dag\include;..\..\..\..\heightfield\include;..\..\..\..\terraingraph\include;..\..\..\..\primitive\include;..\..\..\..\textile\include;..\..\..\..\vtex\include;..\..\..\..\clipmap\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;..\..\..\..\external\rttr\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -80,7 +82,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\unirender\include;..\..\..\..\dag\include;..\..\..\..\heightfield\include;..\..\..\..\terraingraph\include;..\..\..\..\primitive\include;..\..\..\..\external\boost\include;..\..\..\..\external\rttr\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\unirender\include;..\..\..\..\dag\include;..\..\..\..\heightfield\include;..\..\..\..\terraingraph\include;..\..\..\..\primitive\include;..\..\..\..\textile\include;..\..\..\..\vtex\include;..\..\..\..\clipmap\include;..\..\..\..\multitask\include;..\..\..\..\external\boost\include;..\..\..\..\external\rttr\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

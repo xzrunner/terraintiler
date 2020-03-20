@@ -8,6 +8,10 @@
 #include <array>
 #include <vector>
 
+namespace clipmap { class Clipmap; }
+
+//#define HEIGHT_MAP_PCG
+
 namespace terraintiler
 {
 
@@ -26,14 +30,22 @@ public:
         std::vector<Block> blocks;
 
         std::shared_ptr<ur::Texture> heightmap = nullptr;
+        sm::vec4 uv_region = sm::vec4(0, 0, 1, 1);
     };
 
 public:
-    Clipmap();
+    Clipmap(const std::string& vtex_path);
 
     auto& GetAllLayers() const { return m_layers; }
 
+    void Update(float scale);
+    void DebugDraw() const;
+
 private:
+#ifndef HEIGHT_MAP_PCG
+    void InitVTex(const std::string& vtex_path);
+#endif // HEIGHT_MAP_PCG
+
     void Build();
 
     static Block BuildBlock(const sm::rect& region,
@@ -44,6 +56,8 @@ private:
 
 private:
     std::array<Layer, LAYER_NUM> m_layers;
+
+    mutable std::shared_ptr<clipmap::Clipmap> m_vtex = nullptr;
 
 }; // Clipmap
 
