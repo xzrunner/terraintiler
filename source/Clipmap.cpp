@@ -68,9 +68,9 @@ void Clipmap::Update(float scale)
     {
         m_layers[i].heightmap = layers[i].tex;
 
-        auto pos = 1.0 / std::pow(2, i) / 2 - uv_scale * 0.5f;
-        m_layers[i].uv_region.x = m_layers[i].uv_region.y = pos;
-        m_layers[i].uv_region.z = m_layers[i].uv_region.w = uv_scale;
+        auto pos = 1.0 / std::pow(2, i) / 2 - uv_scale * 0.5;
+        m_layers[i].uv_region.x = m_layers[i].uv_region.y = static_cast<float>(pos);
+        m_layers[i].uv_region.z = m_layers[i].uv_region.w = static_cast<float>(uv_scale);
     }
 
 #endif // HEIGHT_MAP_PCG
