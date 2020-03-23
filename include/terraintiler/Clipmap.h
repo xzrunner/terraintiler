@@ -38,8 +38,10 @@ public:
 
     auto& GetAllLayers() const { return m_layers; }
 
-    void Update(float scale);
+    void Update(float scale, const sm::vec2& offset);
     void DebugDraw() const;
+
+    auto GetVTex() const { return m_vtex; }
 
 private:
 #ifndef HEIGHT_MAP_PCG

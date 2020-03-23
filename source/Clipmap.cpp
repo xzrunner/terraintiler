@@ -54,10 +54,10 @@ Clipmap::Clipmap(const std::string& vtex_path)
 #endif // HEIGHT_MAP_PCG
 }
 
-void Clipmap::Update(float scale)
+void Clipmap::Update(float scale, const sm::vec2& offset)
 {
 #ifndef HEIGHT_MAP_PCG
-    m_vtex->Update(scale, sm::vec2(0, 0));
+    m_vtex->Update(scale, offset);
 
     auto& layers = m_vtex->GetAllLayers();
     const auto tex_sz = m_vtex->GetStackTexSize();
@@ -66,11 +66,19 @@ void Clipmap::Update(float scale)
     double uv_scale = 1.0 / std::pow(2, 1);
     for (size_t i = 0, n = layers.size(); i < n; ++i)
     {
-        m_layers[i].heightmap = layers[i].tex;
+        auto& src = layers[i];
+        auto& dst = m_layers[i];
+        dst.heightmap = layers[i].tex;
 
-        auto pos = 1.0 / std::pow(2, i) / 2 - uv_scale * 0.5;
-        m_layers[i].uv_region.x = m_layers[i].uv_region.y = static_cast<float>(pos);
-        m_layers[i].uv_region.z = m_layers[i].uv_region.w = static_cast<float>(uv_scale);
+        auto r = clipmap::TextureStack::CalcUVRegion(i, src);
+        dst.uv_region.x = r.xmin;
+        dst.uv_region.y = r.ymin;
+        dst.uv_region.z = r.Width();
+        dst.uv_region.w = r.Height();
+
+        //auto pos = 1.0 / std::pow(2, i) / 2 - uv_scale * 0.5;
+        //dst.uv_region.x = dst.uv_region.y = static_cast<float>(pos);
+        //dst.uv_region.z = dst.uv_region.w = static_cast<float>(uv_scale);
     }
 
 #endif // HEIGHT_MAP_PCG
