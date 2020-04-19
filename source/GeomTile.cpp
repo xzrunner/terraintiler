@@ -1,8 +1,11 @@
 #include "terraintiler/GeomTile.h"
 
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
 #include <heightfield/Utility.h>
+#include <unirender2/Device.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/IndexBuffer.h>
+#include <unirender2/VertexBuffer.h>
 
 #include <vector>
 
@@ -18,8 +21,8 @@ Renderable GeomTile::GetRenderable(size_t lod) const
     return lod >= MAX_LOD_LEVEL ? m_rd[MAX_LOD_LEVEL - 1] : m_rd[lod];
 }
 
-void GeomTile::Build(const sm::rect& region, size_t width, size_t height,
-                     const std::vector<int32_t>& heights)
+void GeomTile::Build(const ur2::Device& dev, const sm::rect& region, size_t width,
+                     size_t height, const std::vector<int32_t>& heights)
 {
     m_built = true;
 
@@ -41,14 +44,10 @@ void GeomTile::Build(const sm::rect& region, size_t width, size_t height,
         }
     }
 
-    auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-
     size_t w = width;
     size_t h = height;
     for (size_t i = 0; i < MAX_LOD_LEVEL; ++i)
     {
-        m_rd[i].vbo = rc.CreateBuffer(ur::VERTEXBUFFER, verts.data(), sizeof(sm::vec3) * verts.size());
-
         std::vector<uint32_t> indices;
         indices.resize((w - 1) * (h - 1) * 6);
         assert(indices.size() < 0xffffffff);
@@ -68,8 +67,19 @@ void GeomTile::Build(const sm::rect& region, size_t width, size_t height,
             }
         }
 
-        m_rd[i].ebo = rc.CreateBuffer(ur::INDEXBUFFER, indices.data(), sizeof(uint32_t) * indices.size());
-        m_rd[i].num = indices.size();
+        auto va = dev.CreateVertexArray();
+
+        auto ibuf_sz = sizeof(uint32_t) * indices.size();
+        auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+        ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+        va->SetIndexBuffer(ibuf);
+
+        auto vbuf_sz = sizeof(sm::vec3) * verts.size();
+        auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+        vbuf->ReadFromMemory(verts.data(), vbuf_sz, 0);
+        va->SetVertexBuffer(vbuf);
+
+        m_rd[i].va = va;
 
         if (i == MAX_LOD_LEVEL - 1) {
             break;

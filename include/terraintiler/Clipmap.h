@@ -3,12 +3,13 @@
 #include "Renderable.h"
 
 #include <SM_Rect.h>
-#include <unirender/Texture.h>
+#include <unirender2/typedef.h>
 
 #include <array>
 #include <vector>
 
 namespace clipmap { class Clipmap; }
+namespace ur2 { class Device; class Context; }
 
 //#define HEIGHT_MAP_PCG
 
@@ -29,17 +30,18 @@ public:
         // level0 16, others 12
         std::vector<Block> blocks;
 
-        std::shared_ptr<ur::Texture> heightmap = nullptr;
+        ur2::TexturePtr heightmap = nullptr;
         sm::vec4 uv_region = sm::vec4(0, 0, 1, 1);
     };
 
 public:
-    Clipmap(const std::string& vtex_path);
+    Clipmap(const ur2::Device& dev, const std::string& vtex_path);
 
     auto& GetAllLayers() const { return m_layers; }
 
-    void Update(float scale, const sm::vec2& offset);
-    void DebugDraw() const;
+    void Update(const ur2::Device& dev, ur2::Context& ctx,
+        float scale, const sm::vec2& offset);
+    void DebugDraw(const ur2::Device& dev, ur2::Context& ctx) const;
 
     auto GetVTex() const { return m_vtex; }
 
@@ -48,10 +50,10 @@ private:
     void InitVTex(const std::string& vtex_path);
 #endif // HEIGHT_MAP_PCG
 
-    void Build();
+    void Build(const ur2::Device& dev);
 
-    static Block BuildBlock(const sm::rect& region,
-        size_t resolution, float scale);
+    static Block BuildBlock(const ur2::Device& dev,
+        const sm::rect& region, size_t resolution, float scale);
 
 private:
     static const size_t LAYER_NUM = 10;

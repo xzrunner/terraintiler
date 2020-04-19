@@ -3,11 +3,12 @@
 #include "terraintiler/Renderable.h"
 
 #include <SM_Rect.h>
+#include <unirender2/typedef.h>
 
 #include <array>
 #include <vector>
 
-namespace ur { class Texture; }
+namespace ur2 { class Device; }
 
 namespace terraintiler
 {
@@ -19,13 +20,13 @@ public:
 
     Renderable GetRenderable(size_t lod) const;
 
-    void Build(const sm::rect& region, size_t width, size_t height,
-        const std::vector<int32_t>& heights);
+    void Build(const ur2::Device& dev, const sm::rect& region,
+        size_t width, size_t height, const std::vector<int32_t>& heights);
 
     bool IsBuilt() const { return m_built; }
 
 public:
-    std::shared_ptr<ur::Texture> heightmap = nullptr;
+    ur2::TexturePtr heightmap = nullptr;
 
 private:
     bool m_built = false;

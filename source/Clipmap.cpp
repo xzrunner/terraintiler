@@ -1,12 +1,14 @@
 #include "terraintiler/Clipmap.h"
 
 #include <SM_Vector.h>
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
 #include <heightfield/HeightField.h>
 #ifdef HEIGHT_MAP_PCG
 #include <terraingraph/device/CellularNoise.h>
 #else
+#include <unirender2/Device.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/IndexBuffer.h>
+#include <unirender2/VertexBuffer.h>
 #include <clipmap/TextureStack.h>
 #include <clipmap/Clipmap.h>
 #include <terraintiler/VirtualTexture.h>
@@ -27,12 +29,12 @@ const float START_SZ = 1.0f;
 namespace terraintiler
 {
 
-Clipmap::Clipmap(const std::string& vtex_path)
+Clipmap::Clipmap(const ur2::Device& dev, const std::string& vtex_path)
 {
 #ifndef HEIGHT_MAP_PCG
     InitVTex(vtex_path);
 #endif // HEIGHT_MAP_PCG
-    Build();
+    Build(dev);
 
 #ifdef HEIGHT_MAP_PCG
     terraingraph::device::CellularNoise noise;
@@ -54,10 +56,11 @@ Clipmap::Clipmap(const std::string& vtex_path)
 #endif // HEIGHT_MAP_PCG
 }
 
-void Clipmap::Update(float scale, const sm::vec2& offset)
+void Clipmap::Update(const ur2::Device& dev, ur2::Context& ctx,
+                     float scale, const sm::vec2& offset)
 {
 #ifndef HEIGHT_MAP_PCG
-    m_vtex->Update(scale, offset);
+    m_vtex->Update(dev, ctx, scale, offset);
 
     auto& layers = m_vtex->GetAllLayers();
     const auto tex_sz = m_vtex->GetStackTexSize();
@@ -84,10 +87,10 @@ void Clipmap::Update(float scale, const sm::vec2& offset)
 #endif // HEIGHT_MAP_PCG
 }
 
-void Clipmap::DebugDraw() const
+void Clipmap::DebugDraw(const ur2::Device& dev, ur2::Context& ctx) const
 {
 #ifndef HEIGHT_MAP_PCG
-    m_vtex->DebugDraw();
+    m_vtex->DebugDraw(dev, ctx);
 #endif // HEIGHT_MAP_PCG
 }
 
@@ -103,7 +106,7 @@ void Clipmap::InitVTex(const std::string& vtex_path)
 }
 #endif // HEIGHT_MAP_PCG
 
-void Clipmap::Build()
+void Clipmap::Build(const ur2::Device& dev)
 {
     const float S_BLOCK = 1.0f / 4;
     const size_t RES = static_cast<size_t>(RESOLUTION * S_BLOCK);
@@ -123,7 +126,7 @@ void Clipmap::Build()
             r.xmax = r.xmin + block_sz;
             r.ymin = y * block_sz - START_SZ * 0.5f;
             r.ymax = r.ymin + block_sz;
-            m_layers[0].blocks[ptr] = BuildBlock(r, RES, 1);
+            m_layers[0].blocks[ptr] = BuildBlock(dev, r, RES, 1);
 
             ++ptr;
         }
@@ -140,24 +143,25 @@ void Clipmap::Build()
         const float h_sz = sz * 0.5f;
         const float hh_sz = h_sz * 0.5f;
 
-        blocks[0] = BuildBlock(sm::rect( -h_sz, hh_sz, -hh_sz, h_sz), RES, scale);
-        blocks[1] = BuildBlock(sm::rect(-hh_sz, hh_sz,      0, h_sz), RES, scale);
-        blocks[2] = BuildBlock(sm::rect(     0, hh_sz,  hh_sz, h_sz), RES, scale);
-        blocks[3] = BuildBlock(sm::rect( hh_sz, hh_sz,   h_sz, h_sz), RES, scale);
+        blocks[0] = BuildBlock(dev, sm::rect( -h_sz, hh_sz, -hh_sz, h_sz), RES, scale);
+        blocks[1] = BuildBlock(dev, sm::rect(-hh_sz, hh_sz,      0, h_sz), RES, scale);
+        blocks[2] = BuildBlock(dev, sm::rect(     0, hh_sz,  hh_sz, h_sz), RES, scale);
+        blocks[3] = BuildBlock(dev, sm::rect( hh_sz, hh_sz,   h_sz, h_sz), RES, scale);
 
-        blocks[4] = BuildBlock(sm::rect( -h_sz,      0, -hh_sz, hh_sz), RES, scale);
-        blocks[5] = BuildBlock(sm::rect( hh_sz,      0,   h_sz, hh_sz), RES, scale);
-        blocks[6] = BuildBlock(sm::rect( -h_sz, -hh_sz, -hh_sz,     0), RES, scale);
-        blocks[7] = BuildBlock(sm::rect( hh_sz, -hh_sz,   h_sz,     0), RES, scale);
+        blocks[4] = BuildBlock(dev, sm::rect( -h_sz,      0, -hh_sz, hh_sz), RES, scale);
+        blocks[5] = BuildBlock(dev, sm::rect( hh_sz,      0,   h_sz, hh_sz), RES, scale);
+        blocks[6] = BuildBlock(dev, sm::rect( -h_sz, -hh_sz, -hh_sz,     0), RES, scale);
+        blocks[7] = BuildBlock(dev, sm::rect( hh_sz, -hh_sz,   h_sz,     0), RES, scale);
 
-        blocks[8]  = BuildBlock(sm::rect( -h_sz, -h_sz, -hh_sz, -hh_sz), RES, scale);
-        blocks[9]  = BuildBlock(sm::rect(-hh_sz, -h_sz,      0, -hh_sz), RES, scale);
-        blocks[10] = BuildBlock(sm::rect(     0, -h_sz,  hh_sz, -hh_sz), RES, scale);
-        blocks[11] = BuildBlock(sm::rect( hh_sz, -h_sz,   h_sz, -hh_sz), RES, scale);
+        blocks[8]  = BuildBlock(dev, sm::rect( -h_sz, -h_sz, -hh_sz, -hh_sz), RES, scale);
+        blocks[9]  = BuildBlock(dev, sm::rect(-hh_sz, -h_sz,      0, -hh_sz), RES, scale);
+        blocks[10] = BuildBlock(dev, sm::rect(     0, -h_sz,  hh_sz, -hh_sz), RES, scale);
+        blocks[11] = BuildBlock(dev, sm::rect( hh_sz, -h_sz,   h_sz, -hh_sz), RES, scale);
     }
 }
 
-Clipmap::Block Clipmap::BuildBlock(const sm::rect& region, size_t res, float scale)
+Clipmap::Block Clipmap::BuildBlock(const ur2::Device& dev, const sm::rect& region,
+                                   size_t res, float scale)
 {
     std::vector<sm::vec2> verts(res * res);
     for (size_t y = 0; y < res; ++y)
@@ -172,10 +176,6 @@ Clipmap::Block Clipmap::BuildBlock(const sm::rect& region, size_t res, float sca
     }
 
     Renderable rd;
-
-    auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-
-    rd.vbo = rc.CreateBuffer(ur::VERTEXBUFFER, verts.data(), sizeof(sm::vec2) * verts.size());
 
     std::vector<uint16_t> indices;
     indices.resize((res - 1) * (res - 1) * 6);
@@ -196,8 +196,17 @@ Clipmap::Block Clipmap::BuildBlock(const sm::rect& region, size_t res, float sca
         }
     }
 
-    rd.ebo = rc.CreateBuffer(ur::INDEXBUFFER, indices.data(), sizeof(uint16_t) * indices.size());
-    rd.num = indices.size();
+    rd.va = dev.CreateVertexArray();
+
+    auto ibuf_sz = sizeof(unsigned short) * indices.size();
+    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    rd.va->SetIndexBuffer(ibuf);
+
+    auto vbuf_sz = sizeof(sm::vec2) * verts.size();
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(verts.data(), vbuf_sz, 0);
+    rd.va->SetVertexBuffer(vbuf);
 
     Block b;
     b.rd = rd;

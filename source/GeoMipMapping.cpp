@@ -20,7 +20,7 @@ GeoMipMapping::GeoMipMapping(size_t width, size_t height)
     m_tiles.resize(width * height);
 }
 
-ur::TexturePtr GeoMipMapping::QueryHeightmap(size_t x, size_t y) const
+ur2::TexturePtr GeoMipMapping::QueryHeightmap(size_t x, size_t y) const
 {
     if (x >= m_width || y >= m_height) {
         return nullptr;
@@ -54,7 +54,7 @@ Renderable GeoMipMapping::QueryRenderable(size_t x, size_t y, size_t level) cons
     return tile.GetRenderable(level);
 }
 
-void GeoMipMapping::UpdateTile(size_t x, size_t y)
+void GeoMipMapping::UpdateTile(const ur2::Device& dev, size_t x, size_t y)
 {
     if (x >= m_width || y >= m_height) {
         return;
@@ -84,7 +84,7 @@ void GeoMipMapping::UpdateTile(size_t x, size_t y)
         r.ymin = static_cast<float>(y);
         r.ymax = r.ymin + 1;
 
-        tile.Build(r, hf->Width(), hf->Height(), hf->GetValues());
+        tile.Build(dev, r, hf->Width(), hf->Height(), hf->GetValues(dev));
     }
 }
 
