@@ -5,7 +5,7 @@
 
 namespace vtex { class VirtualTexture; class FeedbackBuffer; }
 namespace textile { struct VTexInfo; }
-namespace ur2 { class Device; }
+namespace ur { class Device; }
 
 namespace terraintiler
 {
@@ -13,7 +13,7 @@ namespace terraintiler
 class VirtualTexture
 {
 public:
-    VirtualTexture(const ur2::Device& dev, const std::string& filepath);
+    VirtualTexture(const ur::Device& dev, const std::string& filepath);
 
     auto GetVTex() const { return m_vtex; }
 

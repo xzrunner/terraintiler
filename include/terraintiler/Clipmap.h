@@ -3,13 +3,13 @@
 #include "Renderable.h"
 
 #include <SM_Rect.h>
-#include <unirender2/typedef.h>
+#include <unirender/typedef.h>
 
 #include <array>
 #include <vector>
 
 namespace clipmap { class Clipmap; }
-namespace ur2 { class Device; class Context; }
+namespace ur { class Device; class Context; }
 
 //#define HEIGHT_MAP_PCG
 
@@ -30,18 +30,18 @@ public:
         // level0 16, others 12
         std::vector<Block> blocks;
 
-        ur2::TexturePtr heightmap = nullptr;
+        ur::TexturePtr heightmap = nullptr;
         sm::vec4 uv_region = sm::vec4(0, 0, 1, 1);
     };
 
 public:
-    Clipmap(const ur2::Device& dev, const std::string& vtex_path);
+    Clipmap(const ur::Device& dev, const std::string& vtex_path);
 
     auto& GetAllLayers() const { return m_layers; }
 
-    void Update(const ur2::Device& dev, ur2::Context& ctx,
+    void Update(const ur::Device& dev, ur::Context& ctx,
         float scale, const sm::vec2& offset);
-    void DebugDraw(const ur2::Device& dev, ur2::Context& ctx) const;
+    void DebugDraw(const ur::Device& dev, ur::Context& ctx) const;
 
     auto GetVTex() const { return m_vtex; }
 
@@ -50,9 +50,9 @@ private:
     void InitVTex(const std::string& vtex_path);
 #endif // HEIGHT_MAP_PCG
 
-    void Build(const ur2::Device& dev);
+    void Build(const ur::Device& dev);
 
-    static Block BuildBlock(const ur2::Device& dev,
+    static Block BuildBlock(const ur::Device& dev,
         const sm::rect& region, size_t resolution, float scale);
 
 private:

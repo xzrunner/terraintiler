@@ -5,10 +5,10 @@
 #ifdef HEIGHT_MAP_PCG
 #include <terraingraph/device/CellularNoise.h>
 #else
-#include <unirender2/Device.h>
-#include <unirender2/VertexArray.h>
-#include <unirender2/IndexBuffer.h>
-#include <unirender2/VertexBuffer.h>
+#include <unirender/Device.h>
+#include <unirender/VertexArray.h>
+#include <unirender/IndexBuffer.h>
+#include <unirender/VertexBuffer.h>
 #include <clipmap/TextureStack.h>
 #include <clipmap/Clipmap.h>
 #include <terraintiler/VirtualTexture.h>
@@ -29,7 +29,7 @@ const float START_SZ = 1.0f;
 namespace terraintiler
 {
 
-Clipmap::Clipmap(const ur2::Device& dev, const std::string& vtex_path)
+Clipmap::Clipmap(const ur::Device& dev, const std::string& vtex_path)
 {
 #ifndef HEIGHT_MAP_PCG
     InitVTex(vtex_path);
@@ -56,7 +56,7 @@ Clipmap::Clipmap(const ur2::Device& dev, const std::string& vtex_path)
 #endif // HEIGHT_MAP_PCG
 }
 
-void Clipmap::Update(const ur2::Device& dev, ur2::Context& ctx,
+void Clipmap::Update(const ur::Device& dev, ur::Context& ctx,
                      float scale, const sm::vec2& offset)
 {
 #ifndef HEIGHT_MAP_PCG
@@ -87,7 +87,7 @@ void Clipmap::Update(const ur2::Device& dev, ur2::Context& ctx,
 #endif // HEIGHT_MAP_PCG
 }
 
-void Clipmap::DebugDraw(const ur2::Device& dev, ur2::Context& ctx) const
+void Clipmap::DebugDraw(const ur::Device& dev, ur::Context& ctx) const
 {
 #ifndef HEIGHT_MAP_PCG
     m_vtex->DebugDraw(dev, ctx);
@@ -106,7 +106,7 @@ void Clipmap::InitVTex(const std::string& vtex_path)
 }
 #endif // HEIGHT_MAP_PCG
 
-void Clipmap::Build(const ur2::Device& dev)
+void Clipmap::Build(const ur::Device& dev)
 {
     const float S_BLOCK = 1.0f / 4;
     const size_t RES = static_cast<size_t>(RESOLUTION * S_BLOCK);
@@ -160,7 +160,7 @@ void Clipmap::Build(const ur2::Device& dev)
     }
 }
 
-Clipmap::Block Clipmap::BuildBlock(const ur2::Device& dev, const sm::rect& region,
+Clipmap::Block Clipmap::BuildBlock(const ur::Device& dev, const sm::rect& region,
                                    size_t res, float scale)
 {
     std::vector<sm::vec2> verts(res * res);
@@ -199,12 +199,12 @@ Clipmap::Block Clipmap::BuildBlock(const ur2::Device& dev, const sm::rect& regio
     rd.va = dev.CreateVertexArray();
 
     auto ibuf_sz = sizeof(unsigned short) * indices.size();
-    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
     ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
     rd.va->SetIndexBuffer(ibuf);
 
     auto vbuf_sz = sizeof(sm::vec2) * verts.size();
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(verts.data(), vbuf_sz, 0);
     rd.va->SetVertexBuffer(vbuf);
 

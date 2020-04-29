@@ -14,7 +14,7 @@ const int FEEDBACK_SIZE = 64;
 namespace terraintiler
 {
 
-VirtualTexture::VirtualTexture(const ur2::Device& dev, const std::string& filepath)
+VirtualTexture::VirtualTexture(const ur::Device& dev, const std::string& filepath)
 {
     textile::VTexInfo info;
     std::fstream fin(filepath.c_str(), std::ios::in | std::ios::binary);

@@ -1,11 +1,11 @@
 #include "terraintiler/GeomTile.h"
 
 #include <heightfield/Utility.h>
-#include <unirender2/Device.h>
-#include <unirender2/VertexArray.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/IndexBuffer.h>
-#include <unirender2/VertexBuffer.h>
+#include <unirender/Device.h>
+#include <unirender/VertexArray.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/IndexBuffer.h>
+#include <unirender/VertexBuffer.h>
 
 #include <vector>
 
@@ -21,7 +21,7 @@ Renderable GeomTile::GetRenderable(size_t lod) const
     return lod >= MAX_LOD_LEVEL ? m_rd[MAX_LOD_LEVEL - 1] : m_rd[lod];
 }
 
-void GeomTile::Build(const ur2::Device& dev, const sm::rect& region, size_t width,
+void GeomTile::Build(const ur::Device& dev, const sm::rect& region, size_t width,
                      size_t height, const std::vector<int32_t>& heights)
 {
     m_built = true;
@@ -70,12 +70,12 @@ void GeomTile::Build(const ur2::Device& dev, const sm::rect& region, size_t widt
         auto va = dev.CreateVertexArray();
 
         auto ibuf_sz = sizeof(uint32_t) * indices.size();
-        auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+        auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
         ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
         va->SetIndexBuffer(ibuf);
 
         auto vbuf_sz = sizeof(sm::vec3) * verts.size();
-        auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+        auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
         vbuf->ReadFromMemory(verts.data(), vbuf_sz, 0);
         va->SetVertexBuffer(vbuf);
 
